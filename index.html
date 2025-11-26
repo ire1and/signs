@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Irish / English Sign Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --accent: #e5e7eb;
+      --accent-soft: #1f2937;
+      --btn: #f97316;
+      --btn-hover: #ea580c;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 60%);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--panel);
+      border-radius: 18px;
+      border: 1px solid #1f2937;
+      box-shadow:
+        0 18px 60px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(148, 163, 184, 0.08);
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+      overflow: hidden;
+    }
+
+    @media (max-width: 860px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      padding: 24px 26px;
+    }
+
+    .panel.inputs {
+      background: linear-gradient(145deg, #020617, #020617 40%, #111827 100%);
+      border-right: 1px solid #1f2937;
+    }
+
+    @media (max-width: 860px) {
+      .panel.inputs {
+        border-right: none;
+        border-bottom: 1px solid #1f2937;
+      }
+    }
+
+    .panel.preview {
+      background: radial-gradient(circle at top left, #111827, #020617 65%);
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      margin-bottom: 18px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 11px;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input[type="text"]::placeholder {
+      color: #4b5563;
+    }
+
+    input[type="text"]:focus {
+      border-color: #fb923c;
+      box-shadow: 0 0 0 1px rgba(251, 146, 60, 0.4);
+      background: #020617;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .row .field {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin: 8px 0 16px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 9px 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+    }
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: var(--btn);
+      color: #111827;
+      box-shadow: 0 8px 20px rgba(248, 113, 22, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: var(--btn-hover);
+    }
+
+    .btn-secondary {
+      background: var(--accent-soft);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: #374151;
+    }
+
+    .small-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .preview-inner {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .preview-header span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .canvas-wrap {
+      flex: 1;
+      border-radius: 16px;
+      border: 1px solid #1f2937;
+      background: radial-gradient(circle at top, #020617, #020617 55%, #000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      background: transparent;
+    }
+
+    .status {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .status span strong {
+      font-weight: 600;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Left: Inputs -->
+    <div class="panel inputs">
+      <h1>Road sign generator</h1>
+      <p class="subtitle">Enter Irish and English text. The sign image will update live, ready to export as PNG.</p>
+
+      <div class="field">
+        <label for="irishText">Line 1 – Irish</label>
+        <input
+          id="irishText"
+          type="text"
+          placeholder="e.g. An Lorgain"
+          maxlength="40"
+        />
+      </div>
+
+      <div class="field">
+        <label for="englishText">Line 2 – English</label>
+        <input
+          id="englishText"
+          type="text"
+          placeholder="e.g. Lurgan"
+          maxlength="40"
+        />
+      </div>
+
+      <p class="hint">
+        Text will be horizontally centred. Font size auto-scales down if lines are long.
+      </p>
+
+      <div class="controls">
+        <button id="downloadBtn" class="btn-primary" type="button">
+          ⬇️ Download PNG
+        </button>
+
+        <button id="resetBtn" class="btn-secondary" type="button">
+          Reset text
+        </button>
+
+        <span class="small-note">
+          Output size: 1200 × 600 px
+        </span>
+      </div>
+    </div>
+
+    <!-- Right: Preview -->
+    <div class="panel preview">
+      <div class="preview-inner">
+        <div class="preview-header">
+          <span>Live preview</span>
+          <span>Template: <strong>sign-template.png</strong></span>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="signCanvas" width="1200" height="600"></canvas>
+        </div>
+
+        <div class="status">
+          <span>
+            Image status:
+            <strong id="imgStatus">Loading template…</strong>
+          </span>
+          <span>
+            Tips: keep both lines short for best legibility.
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Configuration ===
+    const TEMPLATE_SRC = "sign-template.png"; // put your template file here
+    const CANVAS_WIDTH = 1200;
+    const CANVAS_HEIGHT = 600;
+
+    // Baseline font sizes; will be auto-scaled down for long text.
+    const IRISH_MAX_FONT = 90;
+    const ENGLISH_MAX_FONT = 80;
+
+    const FONT_FAMILY = "Segoe UI, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+
+    // Vertical positioning as fraction of canvas height
+    const IRISH_Y_RATIO = 0.40;   // 40% down from top
+    const ENGLISH_Y_RATIO = 0.62; // 62% down from top
+
+    // Max text width relative to canvas width (to trigger shrink)
+    const MAX_TEXT_WIDTH_RATIO = 0.8;
+
+    const canvas = document.getElementById("signCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const irishInput = document.getElementById("irishText");
+    const englishInput = document.getElementById("englishText");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const imgStatus = document.getElementById("imgStatus");
+
+    const templateImg = new Image();
+    templateImg.src = TEMPLATE_SRC;
+    templateImg.onload = () => {
+      imgStatus.textContent = "Template loaded";
+      drawSign();
+    };
+    templateImg.onerror = () => {
+      imgStatus.textContent = "Template not found – using plain background";
+      drawSign();
+    };
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      // fallback background if template fails
+      const gradient = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      gradient.addColorStop(0, "#020617");
+      gradient.addColorStop(1, "#020617");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      // inner sign rectangle
+      ctx.fillStyle = "#0b1120";
+      ctx.fillRect(60, 60, CANVAS_WIDTH - 120, CANVAS_HEIGHT - 120);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#f97316";
+      ctx.strokeRect(65, 65, CANVAS_WIDTH - 130, CANVAS_HEIGHT - 130);
+    }
+
+    function fitFontSize(text, maxFontSize) {
+      if (!text) return maxFontSize;
+
+      let fontSize = maxFontSize;
+      const maxWidth = CANVAS_WIDTH * MAX_TEXT_WIDTH_RATIO;
+
+      while (fontSize > 16) {
+        ctx.font = `bold ${fontSize}px ${FONT_FAMILY}`;
+        const width = ctx.measureText(text).width;
+        if (width <= maxWidth) break;
+        fontSize -= 2;
+      }
+      return fontSize;
+    }
+
+    function drawCenteredText(text, yRatio, maxFontSize) {
+      if (!text) return;
+      const fontSize = fitFontSize(text, maxFontSize);
+      ctx.font = `bold ${fontSize}px ${FONT_FAMILY}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      // White text with subtle shadow
+      ctx.fillStyle = "#f9fafb";
+      ctx.shadowColor = "rgba(15, 23, 42, 0.9)";
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+
+      const x = CANVAS_WIDTH / 2;
+      const y = CANVAS_HEIGHT * yRatio;
+      ctx.fillText(text, x, y);
+
+      // reset shadow for subsequent operations
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
+
+    function drawSign() {
+      // background / template
+      if (templateImg.complete && templateImg.naturalWidth > 0) {
+        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.drawImage(templateImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      } else {
+        clearCanvas();
+      }
+
+      const irish = irishInput.value.trim();
+      const english = englishInput.value.trim();
+
+      drawCenteredText(irish, IRISH_Y_RATIO, IRISH_MAX_FONT);
+      drawCenteredText(english, ENGLISH_Y_RATIO, ENGLISH_MAX_FONT);
+    }
+
+    // === Events ===
+    irishInput.addEventListener("input", drawSign);
+    englishInput.addEventListener("input", drawSign);
+
+    downloadBtn.addEventListener("click", () => {
+      // force re-render before export
+      drawSign();
+      const dataUrl = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "irish-english-sign.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      irishInput.value = "";
+      englishInput.value = "";
+      drawSign();
+    });
+
+    // Initial draw (in case image is cached or fails)
+    drawSign();
+  </script>
+</body>
+</html>
